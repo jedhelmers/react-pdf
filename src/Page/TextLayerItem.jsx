@@ -1,9 +1,9 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
 
-import PageContext from '../PageContext';
+import PageContext from "../PageContext";
 
-import { isPage, isRotate } from '../shared/propTypes';
+import { isPage, isRotate } from "../shared/propTypes";
 
 export class TextLayerItemInternal extends PureComponent {
   componentDidMount() {
@@ -49,15 +49,29 @@ export class TextLayerItemInternal extends PureComponent {
   get top() {
     const { transform } = this.props;
     const { unrotatedViewport: viewport, defaultSideways } = this;
-    const [/* fontHeightPx */, /* fontWidthPx */, offsetX, offsetY, x, y] = transform;
-    const [/* xMin */, yMin, /* xMax */, yMax] = viewport.viewBox;
+    const [
+      ,
+      ,
+      /* fontHeightPx */ /* fontWidthPx */ offsetX,
+      offsetY,
+      x,
+      y
+    ] = transform;
+    const [, /* xMin */ yMin /* xMax */, , yMax] = viewport.viewBox;
     return defaultSideways ? x + offsetX + yMin : yMax - (y + offsetY);
   }
 
   get left() {
     const { transform } = this.props;
     const { unrotatedViewport: viewport, defaultSideways } = this;
-    const [/* fontHeightPx */, /* fontWidthPx */, /* offsetX */, /* offsetY */, x, y] = transform;
+    const [
+      ,
+      ,
+      ,
+      ,
+      /* fontHeightPx */ /* fontWidthPx */ /* offsetX */ /* offsetY */ x,
+      y
+    ] = transform;
     const [xMin] = viewport.viewBox;
     return defaultSideways ? y - xMin : x - xMin;
   }
@@ -65,7 +79,7 @@ export class TextLayerItemInternal extends PureComponent {
   async getFontData(fontName) {
     const { page } = this.props;
 
-    const font = await new Promise((resolve) => {
+    const font = await new Promise(resolve => {
       page.commonObjs.get(fontName, resolve);
     });
 
@@ -79,7 +93,7 @@ export class TextLayerItemInternal extends PureComponent {
       return;
     }
 
-    element.style.transform = '';
+    element.style.transform = "";
 
     const { fontName, scale, width } = this.props;
 
@@ -87,7 +101,7 @@ export class TextLayerItemInternal extends PureComponent {
 
     const fontData = await this.getFontData(fontName);
 
-    const fallbackFontName = fontData ? fontData.fallbackName : 'sans-serif';
+    const fallbackFontName = fontData ? fontData.fallbackName : "sans-serif";
     element.style.fontFamily = `${fontName}, ${fallbackFontName}`;
 
     const targetWidth = width * scale;
@@ -101,38 +115,42 @@ export class TextLayerItemInternal extends PureComponent {
     }
 
     element.style.transform = transform;
-    element.style.WebkitTransform = transform;
   }
 
-  getElementWidth = (element) => {
+  getElementWidth = element => {
     const { sideways } = this;
-    return element.getBoundingClientRect()[sideways ? 'height' : 'width'];
+    return element.getBoundingClientRect()[sideways ? "height" : "width"];
   };
 
   render() {
     const { fontSize, top, left } = this;
-    const { customTextRenderer, scale, str: text } = this.props;
+    const {
+      customTextRenderer,
+      itemIndex,
+      scale,
+      str: text,
+      page
+    } = this.props;
 
     return (
       <span
-        ref={(ref) => { this.item = ref; }}
         style={{
-          height: '1em',
-          fontFamily: 'sans-serif',
+          height: "1em",
+          fontFamily: "sans-serif",
           fontSize: `${fontSize * scale}px`,
-          position: 'absolute',
+          position: "absolute",
           top: `${top * scale}px`,
           left: `${left * scale}px`,
-          transformOrigin: 'left bottom',
-          whiteSpace: 'pre',
-          pointerEvents: 'all',
+          transformOrigin: "left bottom",
+          whiteSpace: "pre",
+          pointerEvents: "all"
         }}
+        ref={ref => {
+          this.item = ref;
+        }}
+        id={`page-${page.pageIndex + 1}-item-${itemIndex}`}
       >
-        {
-          customTextRenderer
-            ? customTextRenderer(this.props)
-            : text
-        }
+        {customTextRenderer ? customTextRenderer(this.props) : text}
       </span>
     );
   }
@@ -147,7 +165,7 @@ TextLayerItemInternal.propTypes = {
   scale: PropTypes.number,
   str: PropTypes.string.isRequired,
   transform: PropTypes.arrayOf(PropTypes.number).isRequired,
-  width: PropTypes.number.isRequired,
+  width: PropTypes.number.isRequired
 };
 
 export default function TextLayerItem(props) {
