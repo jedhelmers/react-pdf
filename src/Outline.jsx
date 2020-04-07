@@ -18,8 +18,11 @@ import {
 import { eventProps, isClassName, isPdf } from './shared/propTypes';
 
 export class OutlineInternal extends PureComponent {
-  state = {
-    outline: null,
+  constructor(props){
+    super(props)
+    this.state = {
+      outline: null
+    }
   }
 
   componentDidMount() {
